@@ -13,5 +13,13 @@
             "username": "developer"
         }
     },
-    "postCreateCommand": "bash .devcontainer/post-create.sh"
+    "postCreateCommand": "bash .devcontainer/post-create.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "astral-sh.ty",
+                "charliermarsh.ruff"
+            ]
+        }
+    }
 }

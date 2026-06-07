@@ -3,6 +3,7 @@ set -euo pipefail
 
 mise trust --yes
 mise install
+eval "$(mise activate bash)"
 node "$(mise where "npm:@anthropic-ai/claude-code")/lib/node_modules/@anthropic-ai/claude-code/install.cjs"
 
 cat >> ~/.zshrc <<'EOF'
