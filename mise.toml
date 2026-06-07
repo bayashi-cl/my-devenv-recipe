@@ -1,0 +1,6 @@
+[tools]
+uv = "latest"
+pnpm = "latest"
+node = "lts"
+"github:cli/cli" = { version = "latest", exe = "gh" }
+"npm:@anthropic-ai/claude-code" = "latest"

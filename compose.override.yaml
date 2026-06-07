@@ -1,0 +1,16 @@
+services:
+  adminer:
+    image: docker.io/library/adminer:latest
+    # ports:
+    #   - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    labels:
+      traefik.enable: true
+      traefik.http.routers.adminer.rule: "Host(`db-admin.localhost`)"
+
+  whoami:
+    image: docker.io/traefik/whoami:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.whoami.rule: "Host(`whoami.localhost`)"

@@ -1,0 +1,17 @@
+{
+    "name": "my-devenv-recipe",
+    "dockerComposeFile": [
+        "../compose.yaml",
+        "../compose.override.yaml",
+        "compose.devcontainer.yaml"
+    ],
+    "service": "dev",
+    "workspaceFolder": "/workspace",
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "configureZshAsDefaultShell": true,
+            "username": "developer"
+        }
+    },
+    "postCreateCommand": "bash .devcontainer/post-create.sh"
+}
