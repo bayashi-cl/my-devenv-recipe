@@ -1,0 +1,12 @@
+[project]
+name = "mdr-api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "Masaki Kobayashi", email = "bayashi.cl@gmail.com" }]
+requires-python = ">=3.14"
+dependencies = ["fastapi>=0.138.0", "uvicorn>=0.49.0"]
+
+[build-system]
+requires = ["uv_build>=0.11.23,<0.12.0"]
+build-backend = "uv_build"

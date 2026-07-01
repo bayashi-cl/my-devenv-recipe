@@ -1,0 +1,16 @@
+name: my-devenv-recipe-${WORKTREE_SLUG}
+
+networks:
+  default:
+    external: true
+    name: my-devenv-recipe-dev_default
+
+services:
+  dev:
+    labels:
+      - "traefik.http.routers.${WORKTREE_SLUG}.rule=Host(`api-${WORKTREE_SLUG}.${DOMAIN}`)"
+      - "traefik.http.routers.${WORKTREE_SLUG}.entrypoints=web"
+      - "traefik.http.routers.${WORKTREE_SLUG}.service=${WORKTREE_SLUG}"
+      - "traefik.http.services.${WORKTREE_SLUG}.loadbalancer.server.port=8000"
+    volumes:
+      - ${MAIN_REPO_ROOT}/.git:${MAIN_REPO_ROOT}/.git

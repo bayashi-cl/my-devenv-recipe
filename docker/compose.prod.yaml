@@ -1,0 +1,10 @@
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    secrets:
+      - db-password
+
+secrets:
+  db-password:
+    environment: POSTGRES_PASSWORD

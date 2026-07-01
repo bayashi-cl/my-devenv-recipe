@@ -1,0 +1,19 @@
+name: my-devenv-recipe-dev
+
+services:
+  api: !reset null
+  web: !reset null
+  dev:
+    build:
+      context: docker/dev
+      dockerfile: Dockerfile
+    command: sleep infinity
+    # environment:
+    #   DATABASE_URL: postgresql://postgres:password@db:5432/postgres
+    labels:
+      traefik.enable: true
+      traefik.http.routers.api.rule: "Host(`api.${DOMAIN}`)"
+      traefik.http.routers.api.entrypoints: "web"
+      traefik.http.services.api.loadbalancer.server.port: "8000"
+    volumes:
+      - .:/workspace/my-devenv-recipe:cached

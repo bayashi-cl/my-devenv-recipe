@@ -1,23 +1,33 @@
-name: my-devenv-recipe-testing
 services:
-  adminer:
-    image: docker.io/library/adminer:latest
+  # Infra Config
+  db:
     environment:
-      ADMINER_DEFAULT_SERVER: db
-    labels:
-      traefik.enable: true
-      traefik.http.routers.adminer.rule: "Host(`db-admin.localhost`)"
-
-  whoami:
-    image: docker.io/traefik/whoami:latest
-    labels:
-      traefik.enable: true
-      traefik.http.routers.whoami.rule: "Host(`whoami.localhost`)"
+      POSTGRES_PASSWORD: password
 
   proxy:
-    command: 
-      - "--api=true"
+    command:
+      - "--api.dashboard=true"
       - "--entrypoints.web.address=:80"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.constraints=Label(`com.docker.compose.project`,`my-devenv-recipe-testing`)"
+      - "--providers.docker.constraints=LabelRegex(`com.docker.compose.project`,`my-devenv-recipe.*`)"
+    ports:
+      - "127.0.0.1:80:80"
+    labels:
+      traefik.enable: true
+      traefik.http.routers.proxy.rule: "Host(`proxy.${DOMAIN}`)"
+      traefik.http.routers.proxy.entrypoints: "web"
+      traefik.http.routers.proxy.service: "api@internal"
+
+  # Dashboard
+  db-admin:
+    image: adminer:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.db-admin.rule: "Host(`db-admin.${DOMAIN}`)"
+      traefik.http.routers.db-admin.entrypoints: "web"
+
+  e2e:
+    image: ubuntu:latest
+    network_mode: host
+    command: ["sleep", "infinity"]
