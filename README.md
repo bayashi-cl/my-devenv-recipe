@@ -24,10 +24,10 @@ scripts/develop.sh dev
 - infra + dashboard + devenv(dev コンテナ) を起動
 - application(api, web) はリセット済み
 
-フロントエンド開発サーバーは dev コンテナ内で手動起動する:
+フロントエンド開発サーバーは dev コンテナ内でレポジトリ直下から手動起動する:
 
 ```sh
-cd typescript/mdr-web && deno task dev
+deno task web
 ```
 
 ### 3. worktree での開発（worktree）
