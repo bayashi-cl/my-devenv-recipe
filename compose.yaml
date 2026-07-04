@@ -9,7 +9,9 @@ services:
       traefik.http.routers.api.rule: "Host(`api.${DOMAIN}`)"
       traefik.http.routers.api.entrypoints: "web"
   web:
-    image: nginx:latest # TODO
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
     labels:
       traefik.enable: true
       traefik.http.routers.web.rule: "Host(`${DOMAIN}`)"

@@ -6,6 +6,10 @@ dist/
 wheels/
 *.egg-info
 
+# Node / Next.js generated files
+node_modules/
+.next/
+
 # Virtual environments
 .venv
 

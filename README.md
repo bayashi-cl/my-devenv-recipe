@@ -24,6 +24,12 @@ scripts/develop.sh dev
 - infra + dashboard + devenv(dev コンテナ) を起動
 - application(api, web) はリセット済み
 
+フロントエンド開発サーバーは dev コンテナ内でレポジトリ直下から手動起動する:
+
+```sh
+deno task web
+```
+
 ### 3. worktree での開発（worktree）
 
 ```sh
@@ -49,7 +55,7 @@ scripts/develop.sh worktree
 
 |category|service(image)|production|ci|develop|develop(worktree)|
 |:--|:--|:-:|:-:|:-:|:-:|
-|application|api(python), web(nginx)|◯|◯|||
+|application|api(python), web(next.js/deno)|◯|◯|||
 |infra|db(postgres), proxy(traefik)|◯|◯|◯|共有|
 |dashboard|db-admin(adminer)||◯|◯|共有|
 |devenv|dev(ubuntu)|||◯|◯|
