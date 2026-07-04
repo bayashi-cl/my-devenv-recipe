@@ -1,0 +1,8 @@
+{
+  "workspace": ["typescript/*"],
+  "nodeModulesDir": "auto",
+  "unstable": ["detect-cjs", "node-globals", "unsafe-proto", "sloppy-imports"],
+  "tasks": {
+    "web": "deno task --cwd=typescript/mdr-web dev"
+  }
+}

@@ -16,7 +16,8 @@
         "jnoortheen.nix-ide",
         "astral-sh.ty",
         "Anthropic.claude-code",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "denoland.vscode-deno"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "zsh",
@@ -28,6 +29,13 @@
         "editor.codeActionsOnSave": {
           "source.fixAll.ruff": "explicit",
           "source.organizeImports.ruff": "explicit"
+        },
+        "deno.enablePaths": ["typescript"],
+        "[typescript]": {
+          "editor.defaultFormatter": "denoland.vscode-deno"
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "denoland.vscode-deno"
         }
       }
     }
