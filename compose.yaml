@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+    environment:
+      FRONTEND_ORIGIN: "http://${DOMAIN}"
     labels:
       traefik.enable: true
       traefik.http.routers.api.rule: "Host(`api.${DOMAIN}`)"
@@ -14,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: docker/web/Dockerfile
+    environment:
+      API_BASE_URL: "http://api.${DOMAIN}"
     labels:
       traefik.enable: true
       traefik.http.routers.web.rule: "Host(`${DOMAIN}`)"
