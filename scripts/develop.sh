@@ -21,7 +21,7 @@ REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
 
 # Compose file flags per use case
 DEV_FILES=(-f compose.yaml -f compose.override.yaml -f docker/compose.dev.yaml)
-WORKTREE_FILES=(-f docker/compose.dev.yaml -f docker/compose.worktree.yaml)
+WORKTREE_FILES=(-f docker/compose.worktree.yaml)
 
 # Network created by the main repo's compose project (infra shared with worktrees)
 INFRA_NETWORK="my-devenv-recipe-dev_default"

@@ -3,6 +3,16 @@ name: my-devenv-recipe-dev
 services:
   api: !reset null
   web: !reset null
+  proxy:
+    command:
+      - "--api.dashboard=true"
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.constraints=LabelRegex(`com.docker.compose.project`,`my-devenv-recipe-dev.*`)"
+    ports: !override
+      - "127.0.0.1:8080:80"
+
   dev:
     build:
       context: docker/dev

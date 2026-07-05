@@ -1,4 +1,4 @@
-name: my-devenv-recipe-${WORKTREE_SLUG}
+name: my-devenv-recipe-dev-${WORKTREE_SLUG}
 
 networks:
   default:
@@ -7,10 +7,16 @@ networks:
 
 services:
   dev:
+    build:
+      context: docker/dev
+      dockerfile: Dockerfile
+    command: sleep infinity
     labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.${WORKTREE_SLUG}.rule=Host(`api-${WORKTREE_SLUG}.${DOMAIN}`)"
       - "traefik.http.routers.${WORKTREE_SLUG}.entrypoints=web"
       - "traefik.http.routers.${WORKTREE_SLUG}.service=${WORKTREE_SLUG}"
       - "traefik.http.services.${WORKTREE_SLUG}.loadbalancer.server.port=8000"
     volumes:
+      - .:/workspace/my-devenv-recipe:cached
       - ${MAIN_REPO_ROOT}/.git:${MAIN_REPO_ROOT}/.git

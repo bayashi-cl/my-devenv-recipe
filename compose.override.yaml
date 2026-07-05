@@ -10,7 +10,7 @@ services:
       - "--entrypoints.web.address=:80"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.constraints=LabelRegex(`com.docker.compose.project`,`my-devenv-recipe.*`)"
+      - "--providers.docker.constraints=Label(`com.docker.compose.project`,`my-devenv-recipe`)"
     ports:
       - "127.0.0.1:80:80"
     labels:
