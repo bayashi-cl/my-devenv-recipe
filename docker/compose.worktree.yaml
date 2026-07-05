@@ -24,3 +24,9 @@ services:
     volumes:
       - .:/workspace/my-devenv-recipe:cached
       - ${MAIN_REPO_ROOT}/.git:${MAIN_REPO_ROOT}/.git
+      - claude-cache:/home/developer/.claude
+
+volumes:
+  claude-cache:
+    external: true
+    name: my-devenv-recipe-dev_claude-cache

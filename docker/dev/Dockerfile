@@ -44,3 +44,4 @@ EOF
 # configure
 WORKDIR /workspace/my-devenv-recipe
 COPY --chown=${USERNAME}:${USERNAME} dotfiles/.zshrc /home/${USERNAME}/.zshrc
+RUN mkdir -p ~/.claude
