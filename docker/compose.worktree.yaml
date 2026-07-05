@@ -11,6 +11,9 @@ services:
       context: docker/dev
       dockerfile: Dockerfile
     command: sleep infinity
+    environment:
+      FRONTEND_ORIGIN: "http://${WORKTREE_SLUG}.${DOMAIN}:8080"
+      API_BASE_URL: "http://api-${WORKTREE_SLUG}.${DOMAIN}:8080"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.${WORKTREE_SLUG}.rule=Host(`api-${WORKTREE_SLUG}.${DOMAIN}`)"

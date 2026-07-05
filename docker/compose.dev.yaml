@@ -20,6 +20,8 @@ services:
     command: sleep infinity
     environment:
       XDG_CACHE_HOME: /workspace/my-devenv-recipe/.cache
+      FRONTEND_ORIGIN: "http://${DOMAIN}:8080"
+      API_BASE_URL: "http://api.${DOMAIN}:8080"
     #   DATABASE_URL: postgresql://postgres:password@db:5432/postgres
     labels:
       traefik.enable: true
