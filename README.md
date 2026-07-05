@@ -30,6 +30,8 @@ scripts/develop.sh dev
 deno task web
 ```
 
+起動後は proxy 経由で `http://${DOMAIN}`（既定では `http://localhost`）からアクセスできる。
+
 ### 3. worktree での開発（worktree）
 
 ```sh
@@ -43,6 +45,7 @@ scripts/develop.sh worktree
 - `docker/compose.worktree.yaml` のみを使用（build/command/volumes は `docker/compose.dev.yaml` と二重管理）
 - infra と dashboard は dev 環境のものを共有（`my-devenv-recipe-dev_default` ネットワーク）
 - worktree 専用の devenv(dev コンテナ) を起動
+- フロントエンド開発サーバー（`deno task web`）は proxy 経由で `http://${WORKTREE_SLUG}.${DOMAIN}` からアクセスできる
 
 ## まとめ
 

@@ -103,7 +103,7 @@ run_worktree() {
     || docker compose "${DEV_FILES[@]}" exec -T db \
       psql -U postgres -c "CREATE DATABASE $db_name")
 
-  echo "==> [worktree] 準備完了 — DB: $db_name / URL: http://api-${worktree_slug}.${DOMAIN:-localhost}"
+  echo "==> [worktree] 準備完了 — DB: $db_name / API: http://api-${worktree_slug}.${DOMAIN:-localhost} / Web: http://${worktree_slug}.${DOMAIN:-localhost}"
   echo "==> [worktree] dev コンテナに接続します"
   "${worktree_compose[@]}" exec dev zsh
 }
