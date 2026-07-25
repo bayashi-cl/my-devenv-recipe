@@ -9,9 +9,16 @@ services:
       - "--entrypoints.web.address=:80"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.constraints=LabelRegex(`com.docker.compose.project`,`my-devenv-recipe-dev.*`)"
+      - "--providers.docker.constraints=Label(`com.docker.compose.project`,`my-devenv-recipe-dev`)"
+      # labels はコンテナ作成時に固定されるため、worktree のように動的に増減する
+      # ルートは扱えない。dev コンテナ内の scripts/worktree.sh が生成する YAML を
+      # file provider が監視することで、コンテナを作り直さずにルートを増減させる。
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
     ports: !override
       - "127.0.0.1:8080:80"
+    volumes:
+      - ./docker/traefik/dynamic:/etc/traefik/dynamic:ro
 
   dev:
     build:
@@ -20,9 +27,16 @@ services:
     command: sleep infinity
     environment:
       XDG_CACHE_HOME: /workspace/my-devenv-recipe/.cache
-      FRONTEND_ORIGIN: "http://${DOMAIN}:8080"
-      API_BASE_URL: "http://api.${DOMAIN}:8080"
-    #   DATABASE_URL: postgresql://postgres:password@db:5432/postgres
+      # 実行時設定（FRONTEND_ORIGIN / API_BASE_URL / DATABASE_URL / ポート）は
+      # チェックアウトごとの .env.worktree が持つ。ここに書くと全 worktree で
+      # 同じ値が共有されてしまううえ、--env-file は既存の環境変数を上書きしないため
+      # worktree 側の設定が無視される。
+      DOMAIN: "${DOMAIN}"
+      # worktree ごとの DB を dev コンテナから作成・削除するための接続情報。
+      PGHOST: db
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGDATABASE: postgres
     labels:
       traefik.enable: true
       traefik.http.routers.api.rule: "Host(`api.${DOMAIN}`)"

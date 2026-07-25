@@ -8,6 +8,8 @@
   "service": "dev",
   "workspaceFolder": "/workspace/my-devenv-recipe",
   "remoteUser": "developer",
+  // 基点チェックアウトの実行時設定 (.env.worktree) を用意する。冪等で DB 接続も不要。
+  "postStartCommand": "scripts/worktree.sh init",
   "customizations": {
     "vscode": {
       "extensions": [

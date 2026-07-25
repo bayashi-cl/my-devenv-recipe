@@ -1,0 +1,3 @@
+# traefik の file provider が監視するディレクトリ。
+# scripts/worktree.sh が worktree ごとの wt-<slug>.yaml を生成する。
+# proxy 起動時にディレクトリが存在している必要があるため、この空ファイルで追跡する。

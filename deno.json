@@ -3,6 +3,10 @@
   "nodeModulesDir": "auto",
   "unstable": ["detect-cjs", "node-globals", "unsafe-proto", "sloppy-imports"],
   "tasks": {
-    "web": "deno task --cwd=typescript/mdr-web dev"
+    // チェックアウトごとの実行時設定を読み込む。next dev は PORT を解釈するため、
+    // 待ち受けポートも .env.worktree 側で切り替わる。
+    // --env-file はファイルが無くても警告のみで起動してしまい、ポート 3000 と
+    // オリジン未設定のまま他のチェックアウトと混線する。先に存在を検査して止める。
+    "web": "(test -f .env.worktree || (echo 'error: .env.worktree がありません。scripts/worktree.sh init（worktree なら add）で用意してください。' && exit 1)) && deno task --env-file=.env.worktree --cwd=typescript/mdr-web dev"
   }
 }
