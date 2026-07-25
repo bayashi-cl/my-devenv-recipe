@@ -16,4 +16,5 @@
 
 - コンテナ群の起動・切り替え（`docker compose`, `scripts/develop.sh` 等）はホスト側で人間が行う操作。エージェントは通常すでに dev コンテナ内から起動されているため、これらを自ら実行する場面は基本的に無い
 - 例外として、フロント開発サーバー (`deno task web`) は dev コンテナ内から手動起動する必要がある
+- worktree は dev コンテナ内に作る運用であり、エージェント自身が管理できる。ただし DB・ポート・traefik ルートの割り当てが伴うため、`git worktree` を直接叩かず `scripts/worktree.sh` を使う（[.claude/skills/worktree/SKILL.md](.claude/skills/worktree/SKILL.md) 参照）
 - `typescript/mdr-web/AGENTS.md` には Next.js の破壊的変更に関する固有の注意書きがある。`mdr-web` 配下で作業する際は必ず参照すること

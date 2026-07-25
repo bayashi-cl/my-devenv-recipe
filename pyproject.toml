@@ -2,7 +2,9 @@
 dev = ["taskipy>=1.14.1", "ty>=0.0.51"]
 
 [tool.taskipy.tasks]
-api = "uvicorn mdr_api:create_app --factory --reload --host 0.0.0.0"
+# チェックアウトごとの実行時設定を読み込んでから起動する。.env.worktree が無ければ
+# ここで失敗させ、dev 用のデフォルト値で暗黙に起動させない（fail-fast）。
+api = "set -a && . ./.env.worktree && set +a && uvicorn mdr_api:create_app --factory --reload --host 0.0.0.0 --port ${API_PORT}"
 
 [tool.uv.workspace]
 members = ["python/*"]

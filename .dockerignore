@@ -1,0 +1,23 @@
+# build context は `.` なので、除外しないと生成物や worktree まで転送される。
+# 特に .worktrees/ は worktree の数だけ context が肥大するため必須。
+# Dockerfile 側は必要なファイルを選択的に COPY しているため、ここでの除外は
+# ビルド結果に影響しない。
+
+.git/
+.worktrees/
+
+# キャッシュ・仮想環境・依存ツリー
+.cache/
+.venv/
+**/.venv/
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+**/__pycache__/
+**/*.py[oc]
+**/*.egg-info
+
+# 環境依存の設定（実行時に注入するため、イメージに焼き込まない）
+.env
+.env.worktree

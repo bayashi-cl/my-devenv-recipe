@@ -15,3 +15,11 @@ node_modules/
 
 # Environment variables
 .env
+# チェックアウトごとの実行時設定（scripts/worktree.sh が生成）
+.env.worktree
+
+# dev コンテナ内で作成する worktree
+.worktrees/
+
+# worktree ごとの traefik ルート（scripts/worktree.sh が生成）
+docker/traefik/dynamic/*.yaml
