@@ -31,8 +31,6 @@ readonly WT_MAX=50
 # proxy が公開されているホスト側ポート（compose.dev.yaml の ports と対応する）。
 readonly PROXY_PORT=8080
 
-readonly LOCK_REASON="dev コンテナ内で管理している worktree。ホストからは存在しないパスに見えるため prune 禁止。"
-
 die() {
   echo "error: $*" >&2
   exit 1
@@ -49,6 +47,12 @@ require_devenv() {
   [[ -n "${PGHOST:-}" ]] || die "PGHOST が未設定です。dev コンテナ内で実行してください。"
   [[ -n "${PGUSER:-}" ]] || die "PGUSER が未設定です。dev コンテナ内で実行してください。"
   command -v psql >/dev/null || die "psql が見つかりません。dev コンテナ内で実行してください。"
+
+  # worktree の管理情報を相対パスで記録するために必須（Git 2.48 以降）。絶対パスで
+  # 記録されると、ホストとコンテナでマウント先が違うせいで prune 対象になってしまう。
+  # `-h` は終了コード 129 を返すため、pipefail に巻き込まれないよう握りつぶす。
+  { git worktree add -h 2>&1 || true; } | grep -q "relative-paths" \
+    || die "git が --relative-paths に対応していません（Git 2.48 以降が必要）。"
 }
 
 # worktree の中から実行されても、常に基点チェックアウトを指す。
@@ -204,18 +208,17 @@ cmd_add() {
 
   mkdir -p "$WORKTREES_DIR"
 
+  # --relative-paths が要。管理情報を絶対パスで記録すると、ホストとコンテナで
+  # マウント先が違うせいでホスト側からは存在しないパスに見え、git gc が誘発する
+  # prune の対象になってしまう。相対パスならどちらから見ても正しく解決される。
   info "worktree を作成中: $wt_dir (branch: $branch)"
   if git -C "$MAIN_ROOT" show-ref --verify --quiet "refs/heads/$branch"; then
-    git -C "$MAIN_ROOT" worktree add "$wt_dir" "$branch"
+    git -C "$MAIN_ROOT" worktree add --relative-paths "$wt_dir" "$branch"
   elif git -C "$MAIN_ROOT" show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-    git -C "$MAIN_ROOT" worktree add --track -b "$branch" "$wt_dir" "origin/$branch"
+    git -C "$MAIN_ROOT" worktree add --relative-paths --track -b "$branch" "$wt_dir" "origin/$branch"
   else
-    git -C "$MAIN_ROOT" worktree add -b "$branch" "$wt_dir"
+    git -C "$MAIN_ROOT" worktree add --relative-paths -b "$branch" "$wt_dir"
   fi
-
-  # worktree の管理情報はホストからバインドされた .git に、コンテナ内パスで記録される。
-  # ホスト側からは存在しないパスに見えるため、git gc が誘発する prune で消えうる。lock で防ぐ。
-  git -C "$MAIN_ROOT" worktree lock --reason "$LOCK_REASON" "$wt_dir"
 
   write_env_file "$(env_path_for "$slug")" "$slug" "$port" "$api_port" \
     "http://${slug}.${DOMAIN}:${PROXY_PORT}" \
@@ -320,7 +323,6 @@ cmd_remove() {
   rm -f "$(route_path_for "$slug")"
 
   info "worktree を削除中: $wt_dir"
-  git -C "$MAIN_ROOT" worktree unlock "$wt_dir" 2>/dev/null || true
   if [[ "$force" -eq 1 ]]; then
     git -C "$MAIN_ROOT" worktree remove --force "$wt_dir"
   else

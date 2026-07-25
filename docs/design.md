@@ -71,7 +71,8 @@ labels はコンテナ作成時に固定されるため、コンテナを作り�
 
 ### 注意点
 
-- worktree の管理情報はホストからバインドされた `.git` に、コンテナ内パス（`/workspace/...`）で記録される。ホストからは存在しないパスに見えるため、`git gc` が誘発する `git worktree prune` の対象になりうる。`add` は防御として `git worktree lock` をかける
+- worktree の管理情報はホストからバインドされた `.git` に記録されるが、ホストとコンテナではリポジトリのマウント先が違う。絶対パスで記録すると一方からは存在しないパスに見え、`git gc` が誘発する `git worktree prune` の対象になってしまうため、`add` は `git worktree add --relative-paths`（Git 2.48 以降）で相対パスとして記録する。どちらから見ても正しく解決されるので、ホスト側からも通常どおり worktree を扱える
+- `scripts/worktree.sh` は `--relative-paths` 非対応の git を検出したら実行を拒否する。絶対パスで記録された worktree を作ってしまうと、prune で管理情報を失うため
 - `.worktrees/` は build context を肥大させるため `.dockerignore` で除外している
 - `docker compose down -v` の後は DB が失われるため `scripts/worktree.sh sync` で復元する
 

@@ -58,9 +58,9 @@ deno task web
 | `scripts/worktree.sh remove <slug>` | worktree と一式を撤去する |
 | `scripts/worktree.sh sync` | `.env.worktree` を正として DB とルートを再生成する |
 
-ホスト側で `git worktree prune` を実行しないこと。worktree の管理情報にはコンテナ内の
-パスが記録されており、ホストからは存在しないパスに見えるため prune 対象になってしまう
-（`add` は防御として `git worktree lock` をかけている）。
+worktree は `git worktree add --relative-paths`（Git 2.48 以降）で作られ、管理情報が
+相対パスで記録される。ホストとコンテナでリポジトリのマウント先が違っても双方から
+正しく解決されるため、ホスト側の `git worktree list` や `git gc` も問題なく使える。
 
 ## 実行時設定
 

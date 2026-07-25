@@ -60,10 +60,10 @@ scripts/worktree.sh remove <slug>
 
 ## 注意点
 
-- **`git worktree prune` をホスト側で実行しない。** worktree の管理情報はホストから
-  バインドされた `.git` に、コンテナ内のパス（`/workspace/...`）で記録される。ホストからは
-  存在しないパスに見えるため prune 対象になってしまう。`add` は防御として
-  `git worktree lock` をかけており、これを解除したまま放置しないこと。
+- **worktree を手動で `git worktree add` しない。** DB・ポート・ルートが揃わないだけでなく、
+  管理情報が絶対パスで記録される。ホストとコンテナではリポジトリのマウント先が違うため、
+  絶対パスだと一方からは存在しないパスに見え、`git worktree prune` で管理情報を失う。
+  `scripts/worktree.sh` は `--relative-paths` を付けてこれを回避している。
 - **`add` が途中で失敗した場合**は `remove <slug> --force` で片付けてからやり直す。DB や
   ルートだけが欠けている状態なら `sync` で復旧できる。
 - **`docker compose down -v` の後**は DB が消えているので `sync` を実行する。worktree の
