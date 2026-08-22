@@ -27,6 +27,13 @@ services:
     command: sleep infinity
     environment:
       XDG_CACHE_HOME: /workspace/my-devenv-recipe/.cache
+      # Claude Code の設定・認証情報を丸ごと claude-cache ボリューム内に集約する。
+      # 認証トークンの .credentials.json はもともと ~/.claude に置かれ永続化されて
+      # いたが、アカウント・オンボーディング状態を持つ ~/.claude.json はホーム直下
+      # （ボリューム外）にあり、コンテナ recreate で失われて再認証が必要になっていた。
+      # CLAUDE_CONFIG_DIR を永続化済みの ~/.claude に向けると .claude.json も同ディレ
+      # クトリ配下に作られ、recreate をまたいで認証が維持される。
+      CLAUDE_CONFIG_DIR: /home/developer/.claude
       # 実行時設定（FRONTEND_ORIGIN / API_BASE_URL / DATABASE_URL / ポート）は
       # チェックアウトごとの .env.worktree が持つ。ここに書くと全 worktree で
       # 同じ値が共有されてしまううえ、--env-file は既存の環境変数を上書きしないため
