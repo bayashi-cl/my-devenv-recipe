@@ -12,24 +12,38 @@ description: このリポジトリで git worktree を作成・一覧・撤去�
 - 専用データベース `wt_<slug>`
 - traefik の動的ルート `docker/traefik/dynamic/wt-<slug>.yaml`
 
-によって行う。これらを揃えるのが `scripts/worktree.sh` の役割であり、**`git worktree add` を
-直接実行してはいけない**（設定・DB・ルートが無いまま開発サーバーが起動できない状態になる）。
+によって行う。これらを揃えるのが `scripts/worktree.sh` の役割である。
+
+作成から一式の用意までを一度に行うなら `add` を使う。一方、副資源の用意（`.env.worktree`・
+DB・ルート・依存のインストール）は `provision` という**作成主体を問わない冪等な処理**に
+切り出してある。外部ツール（`claude -w` など）や素の `git worktree add` で作られた worktree でも、
+その中で `provision` を叩けば一式がそろう（`uv sync` と同じ感覚で使える）。設定・DB・ルートが
+無いまま開発サーバーを起動しようとすると失敗するので、**作成しただけの worktree は必ず
+`provision` する**こと。
 
 ## コマンド
 
 すべて dev コンテナ内から実行する。基点チェックアウト・worktree のどちらから実行してもよい。
 
 ```sh
-scripts/worktree.sh add <branch>      # worktree を作成し一式を用意する
-scripts/worktree.sh list              # worktree と割り当て済みリソースを一覧する
-scripts/worktree.sh remove <slug>     # worktree と一式を撤去する
-scripts/worktree.sh sync              # .env.worktree を正として DB とルートを再生成する
-scripts/worktree.sh init              # 基点チェックアウトの実行時設定を用意する
+scripts/worktree.sh add <branch>        # worktree を作成し一式を用意する
+scripts/worktree.sh provision [<path>]  # worktree（既定は現在地）の副資源を冪等に用意する
+scripts/worktree.sh provision --gc      # 対応する worktree の無い DB・ルートを刈り取る
+scripts/worktree.sh list                # worktree と割り当て済みリソースを一覧する
+scripts/worktree.sh remove <slug>       # worktree と一式を撤去する
+scripts/worktree.sh sync                # 全 worktree を正として DB とルートを再生成する
+scripts/worktree.sh init                # 基点チェックアウトの実行時設定を用意する
 ```
 
 `add` はブランチが未作成なら作成し、`origin/<branch>` があれば追跡ブランチとして
 チェックアウトする。`--no-install` を付けると依存関係のインストール（`uv sync` /
 `deno install`）を省略でき、確認だけしたいときに速い。
+
+`provision` は既存の `.env.worktree` があればそれを正として再利用し（ポート等は変えない）、
+無ければブランチ名から slug を導出して空きポートを新規採番する。冪等なので何度叩いてもよい。
+外部ツールで worktree を作ったときはその中で `provision` を実行する。ポートの採番は
+`git worktree list` が返す全 worktree を走査するため、`.worktrees/` の外に作られた worktree も
+見落とさず衝突しない。
 
 ## worktree で開発する
 
@@ -58,12 +72,19 @@ scripts/worktree.sh remove <slug>
 その状態で撤去してよいか判断できないときは、**勝手に `--force` を付けず利用者に確認する**。
 `remove` はローカルブランチを消さないので、同じブランチで `add` をやり直せる。
 
+外部ツールや素の `git worktree remove` で worktree を消すと、DB とルートだけが取り残される。
+`scripts/worktree.sh provision --gc` を叩くと、対応する worktree が無い `wt_*` DB と
+`wt-*.yaml` ルートを刈り取れる。
+
 ## 注意点
 
-- **worktree を手動で `git worktree add` しない。** DB・ポート・ルートが揃わないだけでなく、
-  管理情報が絶対パスで記録される。ホストとコンテナではリポジトリのマウント先が違うため、
-  絶対パスだと一方からは存在しないパスに見え、`git worktree prune` で管理情報を失う。
-  `scripts/worktree.sh` は `--relative-paths` を付けてこれを回避している。
+- **外部ツールや素の `git worktree add` で作った場合は必ず `provision` する。** そのままでは
+  DB・ポート・ルートが揃わず、開発サーバーが起動できない。`provision` は場所を問わず一式を用意する。
+- **worktree の管理情報は相対パスで記録される必要がある。** ホストとコンテナではリポジトリの
+  マウント先が違うため、絶対パスだと一方からは存在しないパスに見え、`git worktree prune` で
+  管理情報を失う。`scripts/worktree.sh` は自身の `add` に `--relative-paths` を付けるだけでなく、
+  実行時に `git config worktree.useRelativePaths true` を担保するので、外部ツール経由の
+  `git worktree add`（`--relative-paths` を付けない）でも相対パスで記録される（Git 2.48 以降が必要）。
 - **`add` が途中で失敗した場合**は `remove <slug> --force` で片付けてからやり直す。DB や
   ルートだけが欠けている状態なら `sync` で復旧できる。
 - **`docker compose down -v` の後**は DB が消えているので `sync` を実行する。worktree の
